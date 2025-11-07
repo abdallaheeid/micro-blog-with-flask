@@ -1,9 +1,32 @@
-2025-11-06 21:38:22,845 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 15:41:10,609 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 15:41:32,026 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 15:42:07,684 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 15:42:20,859 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 15:42:28,646 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 15:42:43,030 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 15:55:42,437 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
-2025-11-07 16:44:28,470 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]
+2025-11-07 16:55:30,821 ERROR: Exception on /index [GET] [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask/app.py:838]
+Traceback (most recent call last):
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/routes.py", line 19, in index
+    return render_template('index.html', title='Home Page')
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %} {% block content %}
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/templates/base.html", line 29, in top-level template code
+    {% endif %} {% endwith %} {% block content %}{% endblock %}
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/templates/index.html", line 4, in block 'content'
+    {{ form.hidden_tag() }}
+  File "/Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/venv/lib/python3.8/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'form' is undefined
+2025-11-07 16:56:38,718 INFO: Microblog startup [in /Users/abdallaheid/Documents/software-projects/projects/python-projects/micro-blog-with-flask/app/__init__.py:45]

@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, current_app, jsonify, abort
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app.models import User
@@ -16,6 +16,12 @@ from app.models import Post
 from app.forms import ResetPasswordRequestForm
 from app.emails import send_password_reset_email
 from app.forms import ResetPasswordForm
+from werkzeug.utils import secure_filename
+import os
+import time
+from PIL import Image
+from app.forms import ProfileImageForm
+from flask import flash
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -48,10 +54,21 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = db.session.scalar(
-            sa.select(User).where(User.username == form.username.data))
-        if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+        try:
+            user = db.session.scalar(
+                sa.select(User).where(User.username == form.username.data))
+        except Exception as e:
+            current_app.logger.exception('Database error during login')
+            flash('An internal error occurred. Please try again.')
+            return redirect(url_for('login'))
+
+        try:
+            if user is None or not user.check_password(form.password.data):
+                flash('Invalid username or password')
+                return redirect(url_for('login'))
+        except Exception:
+            current_app.logger.exception('Error checking password')
+            flash('An internal error occurred. Please try again.')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -96,8 +113,77 @@ def user(username):
     prev_url = url_for('user', username=user.username, page=posts.prev_num) \
         if posts.has_prev else None
     form = EmptyForm()
+    profile_form = None
+    if user == current_user:
+        profile_form = ProfileImageForm()
     return render_template('user.html', user=user, posts=posts.items,
-                           next_url=next_url, prev_url=prev_url, form=form)
+                           next_url=next_url, prev_url=prev_url, form=form,
+                           profile_form=profile_form)
+
+
+def allowed_file(filename):
+    if '.' not in filename:
+        return False
+    ext = filename.rsplit('.', 1)[1].lower()
+    return ext in current_app.config.get('ALLOWED_EXTENSIONS', set())
+
+
+@app.route('/user/<username>/upload_profile_image', methods=['POST'])
+@login_required
+def upload_profile_image(username):
+    # Only allow current user to change their own image
+    if username != current_user.username:
+        abort(403)
+    # Use Flask-WTF form so CSRF is validated
+    form = ProfileImageForm()
+    # attach form data and files are available automatically
+    if not form.validate_on_submit():
+        # return validation error messages
+        errors = []
+        for field, errs in form.errors.items():
+            errors.extend(errs)
+        return jsonify({'success': False, 'error': ' '.join(errors) or 'Invalid upload'}), 400
+
+    file = form.file.data
+    if not file:
+        return jsonify({'success': False, 'error': 'No file provided'}), 400
+
+    if not allowed_file(file.filename):
+        return jsonify({'success': False, 'error': 'Invalid file type'}), 400
+
+    filename = secure_filename(file.filename)
+    upload_folder = current_app.config.get('UPLOAD_FOLDER')
+    os.makedirs(upload_folder, exist_ok=True)
+    ext = filename.rsplit('.', 1)[1].lower()
+    unique_name = f'user_{current_user.id}_{int(time.time())}.{ext}'
+    dest_path = os.path.join(upload_folder, unique_name)
+
+    # Save and resize using Pillow to a maximum size (e.g., 400x400)
+    try:
+        img = Image.open(file)
+        img = img.convert('RGB')
+        img.thumbnail((400, 400))
+        img.save(dest_path, optimize=True, quality=85)
+    except Exception as e:
+        current_app.logger.exception('Failed to process uploaded image')
+        return jsonify({'success': False, 'error': 'Failed to process image'}), 500
+
+    # delete previous image file if present
+    old = getattr(current_user, 'profile_image', None)
+    if old and old != unique_name:
+        try:
+            old_path = os.path.join(upload_folder, old)
+            if os.path.exists(old_path):
+                os.remove(old_path)
+        except Exception:
+            current_app.logger.exception('Failed to remove old profile image')
+
+    # Update user record
+    current_user.profile_image = unique_name
+    db.session.commit()
+
+    image_url = url_for('static', filename=f'uploads/{unique_name}')
+    return jsonify({'success': True, 'url': image_url})
     
 
 @app.before_request

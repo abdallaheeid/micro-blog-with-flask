@@ -35,6 +35,8 @@ class User(UserMixin, db.Model):
     about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(
         default=lambda: datetime.now(timezone.utc))
+    # filename for uploaded profile image (stored under static/uploads/)
+    profile_image: so.Mapped[Optional[str]] = so.mapped_column(sa.String(128))
     
     following: so.WriteOnlyMapped['User'] = so.relationship(
         secondary=followers, primaryjoin=(followers.c.follower_id == id),
@@ -58,6 +60,9 @@ class User(UserMixin, db.Model):
         return '<User {}>'.format(self.username)
     
     def avatar(self, size):
+        # If the user uploaded a profile image, use it from static/uploads
+        if getattr(self, 'profile_image', None):
+            return f'/static/uploads/{self.profile_image}'
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
     

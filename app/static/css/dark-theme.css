@@ -1,0 +1,28 @@
+/* Dark Theme CSS */
+
+:root {
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #000000;
+}
+
+[data-bs-theme='dark'] {
+  --bs-body-bg: #1a1a1a;
+  --bs-body-color: #ffffff;
+  --bs-tertiary-bg: #2d2d2d;
+}
+
+.dark-mode-toggle {
+  background: none;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-mode-toggle:hover {
+  opacity: 0.7;
+}

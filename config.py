@@ -13,3 +13,8 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['abdallaheeid@icloud.com']
     POSTS_PER_PAGE = 3
+    # Upload settings
+    UPLOAD_FOLDER = os.path.join(basedir, 'app', 'static', 'uploads')
+    # limit uploads to 4MB by default
+    MAX_CONTENT_LENGTH = 4 * 1024 * 1024
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}

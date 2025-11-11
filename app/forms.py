@@ -6,6 +6,7 @@ from app import db
 from app.models import User
 from wtforms import TextAreaField
 from wtforms.validators import Length
+from flask_wtf.file import FileField, FileAllowed
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -67,3 +68,10 @@ class ResetPasswordForm(FlaskForm):
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Request Password Reset')
+
+
+class ProfileImageForm(FlaskForm):
+    file = FileField('Profile image', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')
+    ])
+    submit = SubmitField('Upload')
